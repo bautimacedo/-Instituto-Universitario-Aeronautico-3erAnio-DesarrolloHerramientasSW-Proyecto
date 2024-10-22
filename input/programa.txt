@@ -1,0 +1,17 @@
+int x;
+int y;
+
+while(y){
+    int z;    
+}
+
+for (i=0; i<10; i++ )
+    a=b+c+i;
+
+for(i = 0; i>0 ; i-- ){
+    x = i*5;
+    z=x+h;
+}
+
+
+for (f = 0,c = 0)
