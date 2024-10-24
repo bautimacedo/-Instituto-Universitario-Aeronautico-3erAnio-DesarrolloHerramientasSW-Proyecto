@@ -15,6 +15,7 @@ RESTA : '-';
 MULT : '*';
 DIV : '/';
 MOD : '%'; 
+ASIG: '=';
 INCR : '++';
 DECR : '--' ; 
 
@@ -24,7 +25,13 @@ MENOREQ : '<=';
 MENOR : '<';
 IGUAL : '==';
 AND : '&&';
+ANDsim : '&'; // agregado 24/10
 OR : '||';
+ORsim: '|'; // agregado 24/10
+POT: '^'; // agregado 24/10
+DESPizq: '<<'; // agregado 24/10
+DESPder: '>>'; // agregado 24/10
+
 
 WHILE :'while';
 NUMERO : DIGITO+ ;
@@ -38,10 +45,21 @@ RETURN: 'return';
 
 tipodato: INT | CHAR | FLOAT | BOOLEAN | DOUBLE ;
 
+opComp: SUMA // agregado 24/10
+      | RESTA
+      | MULT
+      | DIV
+      | MOD
+      | ANDsim
+      | ORsim
+      | POT
+      | DESPder
+      | DESPizq
+      ;
+
 FOR: 'for';
 IF: 'if' ;
 ELSE: 'else' ;
-ASIG: '=';
 
 WS : [ \t\n\r] -> skip;
 ID : (LETRA | '_')(LETRA | DIGITO | '_')* ;
@@ -66,34 +84,37 @@ instrucciones : instruccion instrucciones //es una instruccion con mas instrucci
                 |
                 ;
 
-instruccion: declaracion
-            | iwhile
-            | ifor
-            | if
-            | else
-            | bloque
-            | asignacion PYC
-            | declaracionFunc //agregue
-            | RETURN exp PYC //AGREGUE
-            ;
-
-//crear uno que sea lista de argumentos, tipo de dato ponerlo en minuscula
-
-declaracion: tipodato ID PYC ;
-
-parametrosFunc : tipodato ID COMA parametrosFunc
-              | tipodato ID
-              |
+instruccion: declaracion PYC
+              | declAsig PYC
+              | iwhile
+              | ifor
+              | if
+              | else
+              | bloque
+              | asignacion PYC
+              | prototSpyc PYC 
+              | funcion
+              | RETURN exp PYC 
               ;
 
-declaracionFunc: tipodato ID PA parametrosFunc PC;
-            
-funcion : declaracionFunc LLA instrucciones LLC
-        ;
- 
+//Agregados de Alan ------ Agregue la OPAL
+declaracion : tipodato ID ; // int x
+declAsig : declaracion ASIG NUMERO // int x = 5;
+       | declaracion ASIG ID // int x = a;
+       | declaracion ASIG opal //int x=chule+bauti
+       ; 
 
 
-asignacion: ID ASIG opal ;
+prototSpyc : //tipodato ID PA parFunc? PC; 
+            tipodato ID PA PC // int x ()
+            | tipodato ID PA parFunc PC; // int x (int y, int z) Tambien acepta int x (int y)
+
+parFunc : tipodato ID (COMA parFunc)* ; // El asterisco indica que pueden haber una o mas 'parejas' de coma declaracion.
+
+funcion : prototSpyc bloque; 
+//hasta aca
+asignacion: ID ASIG opal 
+          | ID opComp ASIG opal; //x= operacion 
 
 opal: or;  //completar una operacion aridmeticas, buscar en cppreference, agregamoss operaciones relacionales
 
@@ -162,6 +183,3 @@ predecremento : DECR ID ;
 //if
 if : IF PA opal PC instruccion ;
 else : ELSE instruccion ;
-
-
-

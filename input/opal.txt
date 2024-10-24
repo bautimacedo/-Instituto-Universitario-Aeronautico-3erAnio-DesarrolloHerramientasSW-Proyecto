@@ -1,3 +1,5 @@
-int suma(int a, int b) {
-    return a + b;
+int pollon(int x)
+{
+    int z=x;
+    return z;
 }
