@@ -39,7 +39,6 @@ class Escucha (compiladoresListener) :
             
         if(self.tablaDeSimbolos.buscarGlobal(NombreVariable) != 1):
             self.tablaDeSimbolos.buscarLocal(NombreVariable)
-
             self.tablaDeSimbolos.addIdentificador(NombreVariable, tipoDeDato)
 
     def enterAsignacion(self, ctx: compiladoresParser.AsignacionContext):
@@ -92,17 +91,18 @@ class Escucha (compiladoresListener) :
         nombreFuncion = ctx.prototSpyc().ID().getText()
         if self.tablaDeSimbolos.buscarGlobal(nombreFuncion):
             print("La funcion" + nombreFuncion + "ya esta definida a nivel global.")
-            return None
-        
         # Imprimir la función encontrada para fines de depuración
         print(f"Función encontrada: "+nombreFuncion+" con tipo de retorno: "+tipoRetorno)
 
         # Obtener los parámetros de la función, si existen
-        parametros = ctx.prototSpyc()
+        parametros = ctx.prototSpyc().parFunc()  #Aca se fija si hay parametros
         listaParametros=[] #hacemos lista para luego imprimir
-        if parametros:  # En caso de que hayan parámetros
+        if parametros and parametros.getChildCount() > 0 : #modifique esto para que se fije si tiene parametros
             numHijos = parametros.getChildCount()
             i = 0
+            print(f"Número de hijos en 'parametros': {numHijos}")
+            # for j in range(numHijos):                                   #Esto es para imprimir todos los hijos
+            #     print(f"Hijo {j}: {parametros.getChild(j).getText()}")  #pero ya esta solucionado creo
             while i < numHijos:
                 tipoParametro = parametros.getChild(i).getText()  # Tipo de dato del parámetro
                 nombreParametro = parametros.getChild(i+1).getText()  # Nombre del parámetro
@@ -112,11 +112,17 @@ class Escucha (compiladoresListener) :
                 # Aumentar el índice en 3 para saltar tipo, nombre y la coma
                 if i + 2 < numHijos and parametros.getChild(i + 2).getText() == ',': 
                 #Esta comprobacion sirve para ver si hay otro parametro o si es el ultimo
+                    print("hay mas parametros")
                     i += 3  # Saltamos tipo, nombre y coma
+               
                 else:
                     break  # No hay más parámetros
+
+        else:
+            print("No hay parametros")
         if listaParametros: 
-            print("La funcion "+nombreFuncion+" tiene los siguientes parametros:" )
+            print("La funcion " + nombreFuncion + " tiene los siguientes parametros: " )
+            print(listaParametros)#agregue esto para que imprima la lista
         else:
             print("La funcion no tiene parametros")
 
@@ -125,6 +131,3 @@ class Escucha (compiladoresListener) :
         print("########En esta función se encontró lo siguiente########")
         self.tablaDeSimbolos.contextos[-1].imprimirTabla()  
         self.tablaDeSimbolos.delContexto()
-
-
-        

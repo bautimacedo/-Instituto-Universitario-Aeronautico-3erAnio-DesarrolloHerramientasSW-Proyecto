@@ -45,7 +45,7 @@ RETURN: 'return';
 
 tipodato: INT | CHAR | FLOAT | BOOLEAN | DOUBLE ;
 
-opComp: SUMA // agregado 24/10
+opComp: SUMA 
       | RESTA
       | MULT
       | DIV
@@ -85,36 +85,45 @@ instrucciones : instruccion instrucciones //es una instruccion con mas instrucci
                 ;
 
 instruccion: declaracion PYC
-              | declAsig PYC
-              | iwhile
-              | ifor
-              | if
-              | else
-              | bloque
-              | asignacion PYC
-              | prototSpyc PYC 
-              | funcion
-              | RETURN exp PYC 
-              ;
+            | declAsig PYC
+            | iwhile
+            | ifor
+            | if
+            | else
+            | bloque
+            | asignacion PYC
+            | prototSpyc PYC 
+            | funcion
+            | RETURN opal PYC 
+            | callFunction PYC
+            ;
 
-//Agregados de Alan ------ Agregue la OPAL
 declaracion : tipodato ID ; // int x
-declAsig : declaracion ASIG NUMERO // int x = 5;
-       | declaracion ASIG ID // int x = a;
-       | declaracion ASIG opal //int x=chule+bauti
+declAsig : declaracion ASIG opal //int x=chule+bauti
+       | declaracion ASIG callFunction
        ; 
 
+///////////////////// FUNCION
+prototSpyc :tipodato ID PA PC // int x ()
+           | tipodato ID PA parFunc PC; // int x (int y, int z) Tambien acepta int x (int y)
 
-prototSpyc : //tipodato ID PA parFunc? PC; 
-            tipodato ID PA PC // int x ()
-            | tipodato ID PA parFunc PC; // int x (int y, int z) Tambien acepta int x (int y)
-
-parFunc : tipodato ID (COMA parFunc)* ; // El asterisco indica que pueden haber una o mas 'parejas' de coma declaracion.
+parFunc : tipodato ID (COMA tipodato ID)* ; // El asterisco indica que pueden haber una o mas 'parejas' de coma declaracion
+                                            // no se puede poner (COMA parFunc)* porque toma mal los datos en el escucha
 
 funcion : prototSpyc bloque; 
-//hasta aca
+
+callFunction : ID PA envPar PC ; // Llamada a funcion
+
+envPar : opal lista_envPar | ; // Parametros enviados en la llamada
+lista_envPar : COMA opal lista_envPar | ; // Lista de parametros separados por comas
+
+////////////////////// FIN FUNCION
 asignacion: ID ASIG opal 
-          | ID opComp ASIG opal; //x= operacion 
+          | ID opComp ASIG opal //x+=operacion
+          | ID ASIG callFunction
+          | incremento
+          | decremento
+          ;
 
 opal: or;  //completar una operacion aridmeticas, buscar en cppreference, agregamoss operaciones relacionales
 
@@ -160,24 +169,24 @@ factor : NUMERO  //parentesis es factor
       | PA or PC
       ;
 
-iwhile : WHILE PA ID PC instruccion ;//llave es instruccion compuesta, despues del while una instruccion
+//iwhile : WHILE PA ID PC instruccion ;//llave es instruccion compuesta, despues del while una instruccion
+  iwhile : WHILE PA cond PC bloque ;
 
 bloque : LLA instrucciones LLC; 
 
 //for :
-ifor : FOR PA init PYC cond PYC iter PC instruccion;
+ifor : FOR PA init PYC cond PYC iter PC instruccion
+     | FOR PA declAsig PYC cond PYC iter PC instruccion;
 init : ID ASIG NUMERO ;
 cond : opal;
 iter : asignacion
       | incremento
       | decremento 
-      | preincremento
-      | predecremento
       ;
-incremento : ID INCR ;
-decremento : ID DECR ;
-preincremento : INCR ID ;
-predecremento : DECR ID ;
+incremento : ID INCR
+           | INCR ID ;
+decremento : ID DECR 
+           | DECR ID;
 //fin for
 
 //if

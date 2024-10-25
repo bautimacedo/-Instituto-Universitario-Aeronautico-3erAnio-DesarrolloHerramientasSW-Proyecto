@@ -29,8 +29,9 @@ class TablaSimbolos(object) :
         print("SE ANADIO UN IDENTIFICADOR")
 
     def buscarLocal(self, nombre) :
+        
         if (self.contextos[-1].traerVariable(nombre)) == None:
-            print('"' + nombre + '" no esta usado\n')
+            print('"' + nombre + '" no esta usado en el contexto local\n')
 
         else:
             print('"' + nombre + " ya esta siendo usada localmente\n")
@@ -38,5 +39,5 @@ class TablaSimbolos(object) :
     def buscarGlobal(self, nombre) :
         if(self.contextos[0].traerVariable(nombre)) != None:
             print('"' + nombre + " ya esta siendo usada globalmente\n")
-            return 1
-        return 0
+            return True
+        return False
