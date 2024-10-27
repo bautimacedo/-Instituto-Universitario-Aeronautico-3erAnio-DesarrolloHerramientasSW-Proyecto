@@ -25,15 +25,14 @@ MENOREQ : '<=';
 MENOR : '<';
 IGUAL : '==';
 AND : '&&';
-ANDsim : '&'; // agregado 24/10
+ANDsim : '&'; 
 OR : '||';
-ORsim: '|'; // agregado 24/10
-POT: '^'; // agregado 24/10
-DESPizq: '<<'; // agregado 24/10
-DESPder: '>>'; // agregado 24/10
+ORsim: '|'; 
+POT: '^'; 
+DESPizq: '<<'; 
+DESPder: '>>'; 
 
 
-WHILE :'while';
 NUMERO : DIGITO+ ;
 
 INT:'int';
@@ -57,6 +56,7 @@ opComp: SUMA
       | DESPizq
       ;
 
+WHILE :'while';
 FOR: 'for';
 IF: 'if' ;
 ELSE: 'else' ;
@@ -88,8 +88,8 @@ instruccion: declaracion PYC
             | declAsig PYC
             | iwhile
             | ifor
-            | if
-            | else
+            | iif
+            | ielse
             | bloque
             | asignacion PYC
             | prototSpyc PYC 
@@ -175,8 +175,10 @@ factor : NUMERO  //parentesis es factor
 bloque : LLA instrucciones LLC; 
 
 //for :
-ifor : FOR PA init PYC cond PYC iter PC instruccion
-     | FOR PA declAsig PYC cond PYC iter PC instruccion;
+ifor : FOR PA init PYC cond PYC iter PC bloque //Cambie instruccion por bloque y tambien en if y else
+     | FOR PA declAsig PYC cond PYC iter PC bloque 
+     ;
+
 init : ID ASIG NUMERO ;
 cond : opal;
 iter : asignacion
@@ -190,5 +192,5 @@ decremento : ID DECR
 //fin for
 
 //if
-if : IF PA opal PC instruccion ;
-else : ELSE instruccion ;
+iif : IF PA opal PC bloque ; //Modifique el nombre con una i adelante para que señale instruccion
+ielse : ELSE bloque ;        //y tambien los modifique donde se los usaba

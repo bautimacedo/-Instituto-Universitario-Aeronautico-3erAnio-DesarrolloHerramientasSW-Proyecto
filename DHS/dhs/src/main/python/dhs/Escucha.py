@@ -17,14 +17,6 @@ class Escucha (compiladoresListener) :
     def enterPrograma(self, ctx:compiladoresParser.ProgramaContext):
         print("Comienza la compilacion")
 
-    def enterIwhile(self, ctx:compiladoresParser.IwhileContext):
-        print("Encontre WHILE\n")
-
-    def exitIwhile(self, ctx:compiladoresParser.IwhileContext):
-        print("FIN del WHILE")
-        print("\tCantidad hijos: " + str(ctx.getChildCount()))
-        print("\tTokens: " + str(ctx.getText())+"\n")
-
     def enterDeclaracion(self, ctx:compiladoresParser.DeclaracionContext):
         print("####Declaracion####")
         if isinstance(ctx, compiladoresParser.FuncionContext):
@@ -36,21 +28,43 @@ class Escucha (compiladoresListener) :
         print ("tipo de dato: " + tipoDeDato + "\n")
         NombreVariable = ctx.getChild(1).getText()
         print ("variable: " + NombreVariable + "\n") 
-            
-        if(self.tablaDeSimbolos.buscarGlobal(NombreVariable) != 1):
-            self.tablaDeSimbolos.buscarLocal(NombreVariable)
+
+        buscarLocal = self.tablaDeSimbolos.buscarLocal(NombreVariable)
+        buscarGlobal = self.tablaDeSimbolos.buscarGlobal(NombreVariable)    
+
+        if buscarGlobal and buscarLocal:
+            print("La variable "+NombreVariable+" esta disponible y fue asignada")
             self.tablaDeSimbolos.addIdentificador(NombreVariable, tipoDeDato)
+        else:
+            if buscarGlobal!=1:
+                print("La variable "+NombreVariable+" ya esta usada a nivel GLOBAL")
+            else:
+                print("La variable "+NombreVariable+" ya esta usada a nivel LOCAL")    
+
+             
+
 
     def enterAsignacion(self, ctx: compiladoresParser.AsignacionContext):
-        print("### ASIGNACION ###")
-
+        print("---- ASIGNACION ----")
+    # 0 no se encontro, 1 si la variable existe
     def exitAsignacion(self, ctx: compiladoresParser.AsignacionContext):
-        print("ya no hay variables que asignar\n")
+        nombreVariable = ctx.getChild(0).getText()
+        print("Analizando variable: " + nombreVariable + "\n")
 
+        buscarGlobal = self.tablaDeSimbolos.buscarGlobal(nombreVariable)
+        buscarLocal = self.tablaDeSimbolos.buscarLocal(nombreVariable)
+
+        if buscarLocal==1:
+            print("La variable "+nombreVariable+" se hallo a nivel local")
+            buscarLocal.inicializado = 1
+        elif buscarGlobal==1:
+            print("La variable "+nombreVariable+" se hallo a nivel global")
+            buscarGlobal.inicializado = 1
 
     def visitTerminal(self, node: TerminalNode):
-        #print("----> Token: " + node.getText())
+        # print("----> Token: " + node.getText())
         self.numTokens += 1
+        self.numTokensTotal += 1
 
     def visitErrorNode(self, node: ErrorNode):
         print("----> Error: ")
@@ -91,6 +105,8 @@ class Escucha (compiladoresListener) :
         nombreFuncion = ctx.prototSpyc().ID().getText()
         if self.tablaDeSimbolos.buscarGlobal(nombreFuncion):
             print("La funcion" + nombreFuncion + "ya esta definida a nivel global.")
+            return None
+        
         # Imprimir la función encontrada para fines de depuración
         print(f"Función encontrada: "+nombreFuncion+" con tipo de retorno: "+tipoRetorno)
 
@@ -131,3 +147,43 @@ class Escucha (compiladoresListener) :
         print("########En esta función se encontró lo siguiente########")
         self.tablaDeSimbolos.contextos[-1].imprimirTabla()  
         self.tablaDeSimbolos.delContexto()
+#Agregue estos bucles y pase el while junto
+    def enterIif(self, ctx: compiladoresParser.IifContext) :
+        print(' ### Entrando a un if ###\n')
+        contexto = Contexto()
+        self.tablaDeSimbolos.addContexto(contexto)
+    
+    def exitIif(self, ctx: compiladoresParser.IifContext) :
+        print('### Saliendo del if ###\n')
+        #COMPLETAR
+        self.tablaDeSimbolos.delContexto() #Esto elimina el ultimo contexto agregado a tablaDeSimbolos
+
+    def enterIfor(self, ctx: compiladoresParser.IforContext) :
+        print("### Entrando a un for ###\n")
+        contexto = Contexto()
+        self.tablaDeSimbolos.addContexto(contexto)
+
+    def exitIfor(self, ctx: compiladoresParser.IforContext) :
+        print("### Saliendo del for ###\n")
+        #COMPLETAR
+        self.tablaDeSimbolos.delContexto() #Esto elimina el ultimo contexto agregado a tablaDeSimbolos
+        
+
+    def enterIwhile(self, ctx:compiladoresParser.IwhileContext):
+        print("Encontre WHILE\n")
+
+    def exitIwhile(self, ctx:compiladoresParser.IwhileContext):
+        print("FIN del WHILE")
+        print("\tCantidad hijos: " + str(ctx.getChildCount()))
+        print("\tTokens: " + str(ctx.getText())+"\n")
+        self.tablaDeSimbolos.delContexto() #Esto elimina el ultimo contexto agregado a tablaDeSimbolos
+
+    def enterIelse(self, ctx: compiladoresParser.IelseContext):
+        print("### Entrando a un else ###\n")
+        contexto = Contexto()
+        self.tablaDeSimbolos.addContexto(contexto)
+
+    def exitIelse(self, ctx: compiladoresParser.IelseContext):
+        print("### Saliendo del else ###\n")
+        #COMPLETAR
+        self.tablaDeSimbolos.delContexto() #Esto elimina el ultimo contexto agregado a tablaDeSimbolos

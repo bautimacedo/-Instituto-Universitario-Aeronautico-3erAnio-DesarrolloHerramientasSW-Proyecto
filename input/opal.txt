@@ -1,14 +1,4 @@
-int pollon(int x,int y,int z)
-{
-    if(x<y)
-    {
-        while(z<10)
-        {
-        z++;
-        }
-    }
-    return z;
-}
-
 int x;
-x=pollon(10,10,10);
+x = 10;
+
+y = 5;

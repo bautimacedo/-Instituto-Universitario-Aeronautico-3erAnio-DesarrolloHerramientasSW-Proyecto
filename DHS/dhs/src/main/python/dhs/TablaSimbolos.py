@@ -20,24 +20,25 @@ class TablaSimbolos(object) :
         print("largo de la lista de contextos: "+ str(len(self.contextos)))
 
     def delContexto(self) :
-        self.contextos.pop()
+        if self.contextos: #Verifica si hay o no contextos antes de eliminar
+            self.contextos.pop()
+        else:
+            print("No hay contextos para eliminar.")
 
     def addIdentificador(self, nombre, tipoDato) :
         contexto = self.contextos[-1]
         id = ID(nombre, tipoDato, 1, 1)
         contexto.tabla.update({nombre:id})
-        print("SE ANADIO UN IDENTIFICADOR")
+        print("--- Se agrego un Identificador! ---")
 
-    def buscarLocal(self, nombre) :
-        
-        if (self.contextos[-1].traerVariable(nombre)) == None:
-            print('"' + nombre + '" no esta usado en el contexto local\n')
+    def buscarLocal(self, nombre) : # 
+        if (self.contextos[-1].traerVariable(nombre)) != None:
+            print('"' + nombre + '" se esta usando a nivel LOCAL\n') 
+            return 1
+        return 0
 
-        else:
-            print('"' + nombre + " ya esta siendo usada localmente\n")
-        
-    def buscarGlobal(self, nombre) :
+    def buscarGlobal(self, nombre) : # =1 ya existe a nivel global - =0 no 
         if(self.contextos[0].traerVariable(nombre)) != None:
-            print('"' + nombre + " ya esta siendo usada globalmente\n")
-            return True
-        return False
+            print('"' + nombre + " se esta usando a nivel GLOBAL\n")
+            return 1
+        return 0
