@@ -24,24 +24,21 @@ class Escucha (compiladoresListener) :
 
     def exitDeclaracion(self, ctx:compiladoresParser.DeclaracionContext):
         print("####Sali de declaracion####")
-        tipoDeDato = ctx.getChild(0).getText()
-        print ("tipo de dato: " + tipoDeDato + "\n")
-        NombreVariable = ctx.getChild(1).getText()
-        print ("variable: " + NombreVariable + "\n") 
-
-        buscarLocal = self.tablaDeSimbolos.buscarLocal(NombreVariable)
-        buscarGlobal = self.tablaDeSimbolos.buscarGlobal(NombreVariable)    
-
-        if buscarGlobal and buscarLocal:
-            print("La variable "+NombreVariable+" esta disponible y fue asignada")
-            self.tablaDeSimbolos.addIdentificador(NombreVariable, tipoDeDato)
-        else:
-            if buscarGlobal!=1:
-                print("La variable "+NombreVariable+" ya esta usada a nivel GLOBAL")
+        tipoVariable = ctx.getChild(0).getText()
+        print ("tipo de dato: " + tipoVariable + "\n")
+        nombreVariables=[]
+        for i in range(1, ctx.getChildCount(), 2):
+            nombreVariables.append(ctx.getChild(i).getText())    
+            #int x , y , z; --> hacemos que el for arranque en la segunda variable y salte de a dos
+        for nombreVariable in nombreVariables:
+            if self.tablaDeSimbolos.buscarGlobal(nombreVariable) == 1:
+                print("La variable " + nombreVariable + " ya está usada a nivel GLOBAL, debes escoger otro nombre.")
+            elif self.tablaDeSimbolos.buscarLocal(nombreVariable) == 1:
+                print("La variable " + nombreVariable + " ya está usada a nivel LOCAL, debes escoger otro nombre.")
             else:
-                print("La variable "+NombreVariable+" ya esta usada a nivel LOCAL")    
-
-             
+                print("La variable " + nombreVariable + " se agregó correctamente a la tabla de símbolos.")
+                self.tablaDeSimbolos.addIdentificador(nombreVariable, tipoVariable)   
+               
 
 
     def enterAsignacion(self, ctx: compiladoresParser.AsignacionContext):
@@ -60,6 +57,8 @@ class Escucha (compiladoresListener) :
         elif buscarGlobal==1:
             print("La variable "+nombreVariable+" se hallo a nivel global")
             buscarGlobal.inicializado = 1
+        else:
+            print("La variable "+nombreVariable+" no existe por lo tanto no puede ser asignada")    
 
     def visitTerminal(self, node: TerminalNode):
         # print("----> Token: " + node.getText())
@@ -143,7 +142,13 @@ class Escucha (compiladoresListener) :
             print("La funcion no tiene parametros")
 
         self.tablaDeSimbolos.addIdentificador(nombreFuncion, tipoRetorno)
+        print("PRUEBA DEL CHILD")
+        print("PRUEBA DEL CHILD")
+        print("PRUEBA DEL CHILD")
+        print("PRUEBA DEL CHILD")
+        print(ctx.getChild(0).getText())
 
+              
         print("########En esta función se encontró lo siguiente########")
         self.tablaDeSimbolos.contextos[-1].imprimirTabla()  
         self.tablaDeSimbolos.delContexto()
@@ -187,3 +192,20 @@ class Escucha (compiladoresListener) :
         print("### Saliendo del else ###\n")
         #COMPLETAR
         self.tablaDeSimbolos.delContexto() #Esto elimina el ultimo contexto agregado a tablaDeSimbolos
+
+
+    def enterDeclAsig(self, ctx: compiladoresParser.DeclAsigContext):
+        print("### Entrando a una declaración de asignación ###\n")
+    
+    def exitDeclAsig(self, ctx: compiladoresParser.DeclAsigContext):
+        #nombre = ctx.getChild(0).getText()
+        #nombreVariable = nombre [3:]
+        #tipo = ctx.getChild(0).getText()
+        #tipoVariable=tipo[0:3]
+        if self.tablaDeSimbolos.buscarGlobal(nombreVariable)==1:
+            print("La variable "+nombreVariable+" ya esta usada a nivel GLOBAL, debes escoger  otro nombre")
+        elif self.tablaDeSimbolos.buscarLocal(nombreVariable)==1:
+            print("La variable "+nombreVariable+" ya esta usada a nivel LOCAL, debes escoger  otro nombre")    
+        else:
+            print("La variable "+nombreVariable+" se agrego correctamente a la tabla de simbolos")
+            self.tablaDeSimbolos.addIdentificador(nombreVariable, tipoVariable)    

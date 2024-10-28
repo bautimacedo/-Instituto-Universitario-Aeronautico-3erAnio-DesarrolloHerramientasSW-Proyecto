@@ -33,12 +33,12 @@ class TablaSimbolos(object) :
 
     def buscarLocal(self, nombre) : # 
         if (self.contextos[-1].traerVariable(nombre)) != None:
-            print('"' + nombre + '" se esta usando a nivel LOCAL\n') 
+            #print('"' + nombre + '" se esta usando a nivel LOCAL\n') 
             return 1
         return 0
 
     def buscarGlobal(self, nombre) : # =1 ya existe a nivel global - =0 no 
         if(self.contextos[0].traerVariable(nombre)) != None:
-            print('"' + nombre + " se esta usando a nivel GLOBAL\n")
+            #print('"' + nombre + " se esta usando a nivel GLOBAL\n")
             return 1
         return 0

@@ -43,6 +43,7 @@ DOUBLE:'double';
 RETURN: 'return';
 
 tipodato: INT | CHAR | FLOAT | BOOLEAN | DOUBLE ;
+VOID: 'void' ;
 
 opComp: SUMA 
       | RESTA
@@ -98,14 +99,17 @@ instruccion: declaracion PYC
             | callFunction PYC
             ;
 
-declaracion : tipodato ID ; // int x
+declaracion : tipodato ID (COMA ID)* ; // int x
 declAsig : declaracion ASIG opal //int x=chule+bauti
        | declaracion ASIG callFunction
        ; 
 
 ///////////////////// FUNCION
 prototSpyc :tipodato ID PA PC // int x ()
-           | tipodato ID PA parFunc PC; // int x (int y, int z) Tambien acepta int x (int y)
+           | tipodato ID PA parFunc PC
+           | VOID ID PA PC // int x (int y, int z) Tambien acepta int x (int y)
+           | VOID ID PA parFunc PC
+           ;
 
 parFunc : tipodato ID (COMA tipodato ID)* ; // El asterisco indica que pueden haber una o mas 'parejas' de coma declaracion
                                             // no se puede poner (COMA parFunc)* porque toma mal los datos en el escucha
