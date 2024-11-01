@@ -20,7 +20,7 @@ class TablaSimbolos(object) :
         print("largo de la lista de contextos: "+ str(len(self.contextos)))
 
     def delContexto(self) :
-        if self.contextos: #Verifica si hay o no contextos antes de eliminar
+        if len(self.contextos)>1: #Verifica si hay o no contextos antes de eliminar
             self.contextos.pop()
         else:
             print("No hay contextos para eliminar.")
@@ -29,16 +29,22 @@ class TablaSimbolos(object) :
         contexto = self.contextos[-1]
         id = ID(nombre, tipoDato, 1, 1)
         contexto.tabla.update({nombre:id})
-        print("--- Se agrego un Identificador! ---")
+        # print("SE ANADIO UN IDENTIFICADOR")
 
     def buscarLocal(self, nombre) : # 
         if (self.contextos[-1].traerVariable(nombre)) != None:
-            #print('"' + nombre + '" se esta usando a nivel LOCAL\n') 
+        #    print('"' + nombre + '" se esta usando a nivel LOCAL\n') 
             return 1
         return 0
-
-    def buscarGlobal(self, nombre) : # =1 ya existe a nivel global - =0 no 
+        
+    def buscarGlobal(self, nombre) :
         if(self.contextos[0].traerVariable(nombre)) != None:
-            #print('"' + nombre + " se esta usando a nivel GLOBAL\n")
+        #    print('"' + nombre + " ya esta siendo usada globalmente\n")
+            return 1
+        return 0
+    
+    def buscarFuncionGlobal(self, nombre) :
+        if(self.contextos[0].traerVariable(nombre)) != None:
+            print('"' + nombre + '" esta declarada, se puede usar\n')
             return 1
         return 0
